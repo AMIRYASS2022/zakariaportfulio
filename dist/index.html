@@ -15,37 +15,17 @@
       window.__LIVE_URL = 'https://graceful-dragon-c2684d.netlify.app/';
     </script>
     <style>
-      #cube-scene { position: absolute; right: 16px; top: 16px; width: 140px; height: 140px; perspective: 500px; z-index: 3; }
-      #cube { width: 100%; height: 100%; transform-style: preserve-3d; will-change: transform; border-radius: 12px; }
-      .cube-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-size: cover; background-position: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; }
-      .cube-face.front { transform: translateZ(70px); }
-      .cube-face.back { transform: rotateY(180deg) translateZ(70px); }
-      .cube-face.right { transform: rotateY(90deg) translateZ(70px); }
-      .cube-face.left { transform: rotateY(-90deg) translateZ(70px); }
-      .cube-face.top { transform: rotateX(90deg) translateZ(70px); }
-      .cube-face.bottom { transform: rotateX(-90deg) translateZ(70px); }
+      #ball-scene { position: absolute; top: 32px; left: 50%; transform: translateX(-50%); width: 140px; height: 140px; z-index: 3; }
+      #ball { width: 100%; height: 100%; border-radius: 50%; background-size: cover; background-position: center; box-shadow: 0 10px 25px rgba(0,0,0,0.15); will-change: transform; }
     </style>
     <script>
       (function(){
         const scene = document.createElement('div');
-        scene.id = 'cube-scene';
-        const cube = document.createElement('div');
-        cube.id = 'cube';
-        const faces = [
-          {cls:'front', img:'images/me.jpg'},
-          {cls:'back', img:'images/services/web.jpg'},
-          {cls:'right', img:'images/webs/1.jpg'},
-          {cls:'left', img:'images/services/photography.jpg'},
-          {cls:'top', img:'images/services/social.jpg'},
-          {cls:'bottom', img:'images/me.jpg'}
-        ];
-        faces.forEach(f=>{
-          const el = document.createElement('div');
-          el.className = 'cube-face ' + f.cls;
-          el.style.backgroundImage = 'url('+f.img+')';
-          cube.appendChild(el);
-        });
-        scene.appendChild(cube);
+        scene.id = 'ball-scene';
+        const ball = document.createElement('div');
+        ball.id = 'ball';
+        ball.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/6/6d/Soccer_ball.svg')";
+        scene.appendChild(ball);
         function mount(){
           var hero = document.getElementById('home');
           if (hero) {
@@ -56,46 +36,43 @@
           }
         }
 
-        let rx = -15, ry = 30;
-        let vx = 0.02, vy = 0.04;
+        let az = 0;
+        let vz = 0.08;
         let dragging = false;
-        let lastX = 0, lastY = 0;
-        let lastDX = 0, lastDY = 0;
+        let lastX = 0;
+        let lastDX = 0;
 
         function render(){
-          rx += vx;
-          ry += vy;
-          cube.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+          az += vz;
+          ball.style.transform = 'rotateZ(' + az + 'deg)';
           requestAnimationFrame(render);
         }
 
         scene.addEventListener('pointerdown', function(e){
           dragging = true;
           try { scene.setPointerCapture(e.pointerId); } catch {}
-          lastX = e.clientX; lastY = e.clientY;
-          vx = 0; vy = 0;
+          lastX = e.clientX;
+          vz = 0;
         });
 
         scene.addEventListener('pointermove', function(e){
           if(!dragging) return;
           const dx = e.clientX - lastX;
-          const dy = e.clientY - lastY;
-          ry += dx * 0.3;
-          rx -= dy * 0.3;
-          lastDX = dx; lastDY = dy;
-          lastX = e.clientX; lastY = e.clientY;
+          az += dx * 0.6;
+          lastDX = dx;
+          lastX = e.clientX;
+          ball.style.transform = 'rotateZ(' + az + 'deg)';
         });
 
         function endDrag(){
           dragging = false;
-          vx = lastDY * 0.02;
-          vy = lastDX * 0.02;
+          vz = lastDX * 0.06;
         }
 
         scene.addEventListener('pointerup', endDrag);
         scene.addEventListener('pointercancel', endDrag);
 
-        setInterval(function(){ if(!dragging){ vx *= 0.98; vy *= 0.98; } }, 16);
+        setInterval(function(){ if(!dragging){ vz *= 0.98; } }, 16);
         mount();
       })();
     </script>
